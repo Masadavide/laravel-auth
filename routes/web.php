@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Admin\Home\Controller;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,4 +28,6 @@ Route::middleware('auth')
     ->group(function () {
         Route::get('/', 'HomeController@index')
         ->name('home');
+        
+        Route::resource('/posts', 'PostController');
     });
