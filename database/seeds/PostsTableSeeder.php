@@ -20,10 +20,8 @@ class PostsTableSeeder extends Seeder
         for($i=0; $i<5; $i++) {
             $newPost = new Post();
             $newPost->title = $faker->words(7, true);
-            $newPost->author = $faker->words(2, true);
-            $newPost->post_date = $faker->dateTime();
             $newPost->content = $faker->text();
-            $newPost->published = rand(0,1);
+            $newPost->author = $faker->words(2, true);
             $newPost->slug = Str::of($newPost->title)->slug('-');
             $newPost->save();
         }

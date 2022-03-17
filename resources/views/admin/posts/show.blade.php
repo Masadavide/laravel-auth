@@ -5,9 +5,8 @@
 @section('content')
     <div>
         {{$post->title}}
-        {{$post->author}}
-        {{$post->post_date}}
         {{$post->content}}
+        {{$post->author}}
         {{$post->published}}
         {{$post->slug}}
     </div>

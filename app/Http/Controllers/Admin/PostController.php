@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+
 use App\Post;
 
 class PostController extends Controller
@@ -27,7 +30,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('admin.posts.create', compact('post'));
+        return view('admin.posts.create');
     }
 
     /**
@@ -38,7 +41,29 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:50',
+            'author' => 'required|string|max:50',
+            'content' => 'required|string|unique:posts',
+        ]);
+
+        $form_data = $request->all();
+
+        $slugTmp = Str::slug($form_data['title']);
+
+        $count = 1;
+
+        while(Post::where('slug',$slugTmp)->first()){
+            $slugTmp = Str::slug($form_data['title']).'-'.$count;
+            $count ++;
+        }
+
+        $form_data['slug'] = $slugTmp;
+
+        $newPost = new Post();
+
+        $newPost = Post::create($form_data);
+        return redirect()->route('admin.posts.show', $newPost->id);
     }
 
     /**
@@ -58,9 +83,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -70,9 +95,36 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:50',
+            'author' => 'required|string|max:50',
+            'content' => 'required|string',
+        ]);
+
+        $form_data=$request->all();
+
+        if($post->title == $form_data['title']){
+            $slug = $post->slug;
+        }else{
+            $slug = Str::slug($form_data['title']);
+            $count = 1;
+            while(Post::where('slug',$slug)
+                ->where('id','!=',$post->id)
+                ->first()){
+                    $slug = Str::slug($form_data['title']).'-'.$count;
+                    $count ++;
+                }
+            }
+        $form_data['slug'] = $slug; 
+
+
+
+
+        $post->update($form_data);
+
+        return redirect()->route('admin.posts.show', $post->id);  
     }
 
     /**
@@ -81,8 +133,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route("admin.posts.index");
     }
 }
