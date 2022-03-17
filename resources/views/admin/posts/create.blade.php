@@ -3,7 +3,9 @@
 @section('title', 'Blog')
 
 @section('content')
-    @foreach ($posts as $element)
+    <form action="{{route("posts.store")}}" method="POST">
+    @csrf
+
         <ul>
             <li>{{$element->title}}</li>
             <li>{{$element->author}}</li>
@@ -17,7 +19,6 @@
                 visualizza prodotto {{$element->title}}
             </a>
         </button>
-    @endforeach
+
+    </form> 
 @endsection
-
-
